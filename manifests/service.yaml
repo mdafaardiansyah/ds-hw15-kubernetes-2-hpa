@@ -28,6 +28,6 @@ spec:
   - name: http
     port: 80
     targetPort: 80
-    nodePort: 30080     # Port eksternal untuk akses dari luar cluster
+    nodePort: 30081     # Port eksternal untuk akses dari luar cluster
     protocol: TCP
   type: NodePort        # Service type NodePort untuk akses eksternal
