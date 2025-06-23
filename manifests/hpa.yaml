@@ -1,0 +1,37 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+  labels:
+    app: nginx
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment  # Target deployment yang akan di-scale
+  minReplicas: 2            # Minimum replica sesuai requirement
+  maxReplicas: 5            # Maximum replica sesuai requirement
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75  # Target threshold 75% memory usage
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Tunggu 5 menit sebelum scale down
+      policies:
+      - type: Percent
+        value: 50             # Scale down maksimal 50% dari current replicas
+        periodSeconds: 60     # Dalam periode 1 menit
+    scaleUp:
+      stabilizationWindowSeconds: 60   # Tunggu 1 menit sebelum scale up
+      policies:
+      - type: Percent
+        value: 100            # Scale up maksimal 100% dari current replicas
+        periodSeconds: 60     # Dalam periode 1 menit
+      - type: Pods
+        value: 2              # Atau maksimal tambah 2 pods
+        periodSeconds: 60     # Dalam periode 1 menit
+      selectPolicy: Max       # Pilih policy yang memberikan scale up terbesar

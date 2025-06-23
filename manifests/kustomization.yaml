@@ -1,0 +1,42 @@
+# Kustomization file untuk deployment Kubernetes HPA project
+# Memudahkan deployment semua manifest sekaligus
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Metadata untuk kustomization
+metadata:
+  name: nginx-hpa-project
+  annotations:
+    description: "Kubernetes HPA project with nginx deployment"
+
+# Resources yang akan di-deploy
+resources:
+  - deployment.yaml
+  - service.yaml
+  - hpa.yaml
+
+# Common labels yang akan ditambahkan ke semua resources
+commonLabels:
+  project: nginx-hpa
+  environment: development
+  team: devops
+
+# Common annotations
+commonAnnotations:
+  project.description: "Horizontal Pod Autoscaler implementation"
+  project.version: "1.0.0"
+  project.maintainer: "DevOps Team"
+
+# Namespace (optional)
+# namespace: nginx-hpa
+
+# Images yang bisa di-override
+images:
+  - name: nginx
+    newTag: latest
+
+# Replicas yang bisa di-override
+replicas:
+  - name: nginx-deployment
+    count: 2

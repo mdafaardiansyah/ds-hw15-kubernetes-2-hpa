@@ -1,0 +1,52 @@
+# Load test pod untuk memicu HPA autoscaling
+# Pod ini akan menggunakan memory secara intensif untuk testing
+apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-stress-test
+  labels:
+    app: stress-test
+spec:
+  containers:
+  - name: stress
+    image: polinux/stress    # Image untuk stress testing
+    command: ["/bin/sh"]
+    args:
+    - "-c"
+    - "stress --vm 1 --vm-bytes 100M --vm-hang 1"  # Stress test memory 100MB
+    resources:
+      requests:
+        memory: "50Mi"
+        cpu: "100m"
+      limits:
+        memory: "150Mi"
+        cpu: "200m"
+  restartPolicy: Never        # Pod tidak akan restart otomatis
+---
+# Alternative: Load generator untuk HTTP traffic ke nginx
+apiVersion: v1
+kind: Pod
+metadata:
+  name: http-load-generator
+  labels:
+    app: load-generator
+spec:
+  containers:
+  - name: load-generator
+    image: busybox:latest
+    command: ["/bin/sh"]
+    args:
+    - "-c"
+    - |
+      while true; do
+        wget -q -O- http://nginx-service/
+        sleep 0.1
+      done
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "100m"
+      limits:
+        memory: "64Mi"
+        cpu: "200m"
+  restartPolicy: Never

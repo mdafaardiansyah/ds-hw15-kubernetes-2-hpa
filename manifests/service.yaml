@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    app: nginx
+spec:
+  selector:
+    app: nginx          # Selector untuk mengarahkan traffic ke pods dengan label app: nginx
+  ports:
+  - name: http
+    port: 80            # Port yang akan diekspos oleh service
+    targetPort: 80      # Port di container yang akan menerima traffic
+    protocol: TCP
+  type: ClusterIP       # Service type ClusterIP untuk akses internal cluster
+---
+# Optional: NodePort service untuk akses eksternal (testing purposes)
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+  labels:
+    app: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 30080     # Port eksternal untuk akses dari luar cluster
+    protocol: TCP
+  type: NodePort        # Service type NodePort untuk akses eksternal
