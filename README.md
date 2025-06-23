@@ -221,60 +221,6 @@ spec:
 desiredReplicas = ceil[currentReplicas * (currentMetricValue / desiredMetricValue)]
 ```
 
-### Pentingnya Resource Requests dan Limits
-
-#### Resource Requests
-- **Untuk HPA**: HPA menggunakan `resources.requests` sebagai baseline untuk menghitung persentase penggunaan
-- **Untuk Scheduler**: Kubernetes scheduler menggunakan requests untuk menentukan node placement
-- **Contoh**: Jika request memory 64Mi dan usage 48Mi, maka utilization = 48/64 = 75%
-
-#### Resource Limits
-- **Untuk Container**: Mencegah container menggunakan resource berlebihan
-- **Untuk Node**: Melindungi node dari resource exhaustion
-- **Untuk Stability**: Mencegah OOMKilled dan crash
-
-### Skenario Scaling
-
-#### Ketika Memory Usage > 75%
-1. HPA mendeteksi penggunaan memory di atas threshold
-2. Menghitung jumlah replica yang dibutuhkan
-3. Melakukan scale up (menambah pod)
-4. Menunggu stabilization window sebelum scaling berikutnya
-5. Load terdistribusi ke pod baru
-6. Memory usage per pod menurun
-
-#### Ketika Memory Usage < 75%
-1. HPA mendeteksi penggunaan memory di bawah threshold
-2. Menunggu stabilization window (5 menit untuk scale down)
-3. Melakukan scale down (mengurangi pod)
-4. Load terdistribusi ke pod yang tersisa
-5. Memastikan tidak kurang dari minReplicas (2)
-
-### Contoh Kasus Nyata
-
-#### E-commerce Website
-**Skenario**: Website e-commerce dengan traffic yang berfluktuasi
-
-**Normal Hours (08:00-17:00)**:
-- Traffic rendah: 100 concurrent users
-- Memory usage: 40% per pod
-- HPA maintains: 2 pods (minimum)
-
-**Peak Hours (18:00-22:00)**:
-- Traffic tinggi: 1000 concurrent users
-- Memory usage: 85% per pod
-- HPA scales up: 2 → 3 → 4 → 5 pods
-- Memory usage turun: 85% → 68% → 51% → 40%
-
-**Late Night (23:00-07:00)**:
-- Traffic sangat rendah: 20 concurrent users
-- Memory usage: 20% per pod
-- HPA scales down: 5 → 4 → 3 → 2 pods (minimum)
-
-**Benefits**:
-- **Cost Savings**: 60% pengurangan biaya di off-peak hours
-- **Performance**: Response time tetap optimal di peak hours
-- **Reliability**: Tidak ada downtime karena overload
 
 ## 🚀 Cara Menjalankan Project
 
