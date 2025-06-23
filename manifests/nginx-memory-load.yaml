@@ -1,0 +1,77 @@
+# Load test yang akan meningkatkan memory usage pada nginx pods
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-memory-load
+  labels:
+    app: nginx-load-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-load-test
+  template:
+    metadata:
+      labels:
+        app: nginx-load-test
+    spec:
+      containers:
+      - name: nginx-with-load
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        # Script untuk menggunakan memory lebih banyak
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+          # Start nginx in background
+          nginx -g 'daemon off;' &
+          # Create memory load
+          dd if=/dev/zero of=/tmp/memload bs=1M count=80
+          # Keep the container running
+          wait
+---
+# Alternative: Pod yang akan membuat HTTP requests ke nginx service
+apiVersion: v1
+kind: Pod
+metadata:
+  name: intensive-load-generator
+  labels:
+    app: intensive-load
+spec:
+  containers:
+  - name: load-generator
+    image: alpine/curl:latest
+    command: ["/bin/sh"]
+    args:
+    - "-c"
+    - |
+      # Install tools
+      apk add --no-cache stress-ng
+      # Generate intensive HTTP load
+      for i in $(seq 1 10); do
+        (
+          while true; do
+            curl -s http://nginx-service/ > /dev/null
+            sleep 0.01
+          done
+        ) &
+      done
+      # Also create memory pressure
+      stress-ng --vm 1 --vm-bytes 50M --timeout 300s
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "100m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+  restartPolicy: Never
