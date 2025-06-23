@@ -293,7 +293,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 #### 1. Clone/Download Project
 ```bash
-git clone https://github.com/mdafaardiansyah/ds-hw14-kubernetes-2-hpa
+git clone https://github.com/mdafaardiansyah/ds-hw15-kubernetes-2-hpa
 ```
 
 #### 2. Deploy menggunakan Script
