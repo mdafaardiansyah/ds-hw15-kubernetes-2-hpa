@@ -26,7 +26,7 @@ spec:
           limits:
             memory: "128Mi"  # Memory limit untuk mencegah overconsumption
             cpu: "500m"      # CPU limit untuk mencegah overconsumption
-        # Health checks untuk memastikan pod ready
+        # Health checks untuk memastikan pod telah ready
         livenessProbe:
           httpGet:
             path: /
